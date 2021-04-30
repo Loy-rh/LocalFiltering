@@ -23,7 +23,7 @@ matplotlib 3.3.2
   * anaconda3: conda install opencv
   * pip: pip install opencv-python
 
-# Usage
+## Usage
 img: Path of the original image with no noise added<br>
 img_n: Path of the image with added noise.<br>
 
