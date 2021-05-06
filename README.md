@@ -31,6 +31,4 @@ img_n: Path of the image with added noise.<br>
 This source code can only be applied to noise with luminance values of 0 or 255.
 
 ## Author
-
-Ryota Higashimoto <br>
 Image Processing Engineering Laboratory <br>
