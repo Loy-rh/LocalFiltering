@@ -16,9 +16,9 @@ img_n = r"idata4.bmp"
 img_i = cv2.imread(img)     # Original Image
 img_o = cv2.imread(img_n)   # Output Image
 img_n = cv2.imread(img_n)   # Noise Image
-img_i = cv2.cvtColor(img_i, cv2.COLOR_RGB2GRAY)
-img_o = cv2.cvtColor(img_o, cv2.COLOR_RGB2GRAY)
-img_n = cv2.cvtColor(img_n, cv2.COLOR_RGB2GRAY)
+img_i = cv2.cvtColor(img_i, cv2.COLOR_BGR2GRAY)
+img_o = cv2.cvtColor(img_o, cv2.COLOR_BGR2GRAY)
+img_n = cv2.cvtColor(img_n, cv2.COLOR_BGR2GRAY)
 
 # Histogram
 # hist_i = cv2.calcHist([img_i], [0], None, [256], [0, 256])
@@ -35,11 +35,8 @@ img_n = cv2.cvtColor(img_n, cv2.COLOR_RGB2GRAY)
 # Median Filter
 f_size = 5  # n*n filter
 median = cv2.medianBlur(img_o, f_size)
-l1, l2 = np.where(img_o == 0)
-l3, l4 = np.where(img_o == 255)
-for i, j in zip(l1, l2):
-    img_o[i, j] = median[i, j]
-for i, j in zip(l3, l4):
+ol1, ol2 = np.where((img_o == 0) | (img_o == 255))
+for i, j in zip(ol1, ol2):
     img_o[i, j] = median[i, j]
 
 mse_b = mse(img_i, median)  # before
@@ -51,11 +48,8 @@ k = 2
 while(mse_a < mse_b):
     mse_b = mse_a
     median = cv2.medianBlur(img_o, f_size)
-    l1, l2 = np.where(img_o == 0)
-    l3, l4 = np.where(img_o == 255)
+    l1, l2 = np.where((img_o == 0) | (img_o == 255))
     for i, j in zip(l1, l2):
-        img_o[i, j] = median[i, j]
-    for i, j in zip(l3, l4):
         img_o[i, j] = median[i, j]
 
     mse_a = mse(img_i, img_o)
@@ -66,16 +60,12 @@ while(mse_a < mse_b):
 gauss = cv2.GaussianBlur(img_o, (3, 3), 0)
 mse_b = mse(img_i, img_o)
 mse_a = mse(img_i, gauss)
-l1, l2 = np.where(img_n == 0)
-l3, l4 = np.where(img_n == 255)
 
 while(mse_a < mse_b):
     mse_b = mse_a
     gauss = cv2.GaussianBlur(img_o, (3, 3), 0.8)
 
-    for i, j in zip(l1, l2):
-        img_o[i, j] = gauss[i, j]
-    for i, j in zip(l3, l4):
+    for i, j in zip(ol1, ol2):
         img_o[i, j] = gauss[i, j]
 
     mse_a = mse(img_i, img_o)
