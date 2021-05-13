@@ -58,13 +58,14 @@ while(mse_a < mse_b):
 
 # Gaussian Filter
 sigma = 0.55    # Standard deviation
-gauss = cv2.GaussianBlur(img_o, (3, 3), sigma)
+k_size = 3  # kernelsize
+gauss = cv2.GaussianBlur(img_o, (k_size, k_size), sigma)
 mse_b = mse(img_i, img_o)
 mse_a = mse(img_i, gauss)
 
 while(mse_a < mse_b):
     mse_b = mse_a
-    gauss = cv2.GaussianBlur(img_o, (3, 3), sigma)
+    gauss = cv2.GaussianBlur(img_o, (k_size, k_size), sigma)
 
     for i, j in zip(ol1, ol2):
         img_o[i, j] = gauss[i, j]
