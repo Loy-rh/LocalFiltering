@@ -58,7 +58,7 @@ while(mse_a < mse_b):
 
 # Gaussian Filter
 sigma = 0.55    # Standard deviation
-k_size = 3  # kernelsize
+k_size = 5  # kernelsize
 gauss = cv2.GaussianBlur(img_o, (k_size, k_size), sigma)
 mse_b = mse(img_i, img_o)
 mse_a = mse(img_i, gauss)
@@ -72,7 +72,7 @@ while(mse_a < mse_b):
 
     mse_a = mse(img_i, img_o)
 
-print('result:' + str(mse_a))
+print('result:' + str(int(mse_a)))
 
 # Display results
 plt.figure('Execution result')
