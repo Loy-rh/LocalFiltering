@@ -10,10 +10,15 @@ def mse(id, od):
     return (np.square(id.astype(int) - od.astype(int))).mean(axis=None)
 
 
-def Local_Gaussian(img_o, k_size, sigma, l1, l2):
+def Local_median(img_o, f_size):
+    median = cv2.medianBlur(img_o, f_size)
+    img_o = np.where((img_o == 0) | (img_o == 255), median, img_o)
+    return img_o
+
+
+def Local_Gaussian(img_n, img_o, k_size, sigma):
     gauss = cv2.GaussianBlur(img_o, (k_size, k_size), sigma)
-    for i, j in zip(l1, l2):
-        img_o[i, j] = gauss[i, j]
+    img_o = np.where((img_n == 0) | (img_n == 255), gauss, img_o)
     return img_o
 
 
@@ -30,22 +35,17 @@ img_n = cv2.cvtColor(img_n, cv2.COLOR_BGR2GRAY)
 # Filtering process
 # Median Filter
 F_SIZE = 5  # n*n filter
-median = cv2.medianBlur(img_o, F_SIZE)
 img_b = img_o   # Image before filtering process
-
-l1, l2 = np.where((img_o == 0) | (img_o == 255))
-for i, j in zip(l1, l2):
-    img_o[i, j] = median[i, j]
-mse_b = mse(img_b, median)  # before
+img_o = Local_median(img_o, F_SIZE)
+mse_b = 1  # before
 mse_a = mse(img_b, img_o)   # after
 # print('1：' + str(mse_a))
 
 k = 2
 while(mse_a != mse_b):
     mse_b = mse_a
-    median = cv2.medianBlur(img_o, F_SIZE)
     img_b = img_o
-    img_o = np.where((img_o == 0) | (img_o == 255), median, img_o)
+    img_o = Local_median(img_o, F_SIZE)
 
     mse_a = mse(img_b, img_o)
     # print(str(k) + '：' + str(mse_a))
@@ -57,7 +57,7 @@ print("Number of attempts (median):" + str(k - 1))
 SIGMA = 0.55    # Standard deviation
 K_SIZE = 5  # kernelsize
 gauss = cv2.GaussianBlur(img_o, (K_SIZE, K_SIZE), SIGMA)
-img_o = Local_Gaussian(img_o, K_SIZE, SIGMA, l1, l2)
+img_o = Local_Gaussian(img_n, img_o, K_SIZE, SIGMA)
 mse_b = mse(gauss, img_o)
 mse_a = mse(gauss, img_b)
 # print('1：' + str(mse_a))
@@ -66,7 +66,7 @@ k = 2
 while(mse_a != mse_b):
     mse_b = mse_a
     img_b = img_o
-    img_o = Local_Gaussian(img_o, K_SIZE, SIGMA, l1, l2)
+    img_o = Local_Gaussian(img_n, img_o, K_SIZE, SIGMA)
 
     mse_a = mse(gauss, img_o)
     # print(str(k) + '：' + str(mse_a))
