@@ -52,7 +52,7 @@ while(mse_a != mse_b):
     # print(str(k) + '：' + str(mse_a))
     k += 1
 
-print("Number of attempts" + str(k - 1))
+print("Number of attempts (median):" + str(k - 1))
 
 # Gaussian Filter
 SIGMA = 0.55    # Standard deviation
@@ -73,7 +73,7 @@ while(mse_a != mse_b):
     # print(str(k) + '：' + str(mse_a))
     k += 1
 
-print("Number of attempts" + str(k - 1))
+print("Number of attempts (Gaussian):" + str(k - 1))
 print('result:' + str(int(mse(img_i, img_o))))
 
 # Display results
