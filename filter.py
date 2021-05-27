@@ -10,6 +10,13 @@ def mse(id, od):
     return (np.square(id.astype(int) - od.astype(int))).mean(axis=None)
 
 
+def Local_Gaussian(img_o, k_size, sigma, l1, l2):
+    gauss = cv2.GaussianBlur(img_o, (k_size, k_size), sigma)
+    for i, j in zip(l1, l2):
+        img_o[i, j] = gauss[i, j]
+    return img_o
+
+
 img = r"rdata4.bmp"
 img_n = r"idata4.bmp"
 
@@ -20,59 +27,50 @@ img_i = cv2.cvtColor(img_i, cv2.COLOR_BGR2GRAY)
 img_o = cv2.cvtColor(img_o, cv2.COLOR_BGR2GRAY)
 img_n = cv2.cvtColor(img_n, cv2.COLOR_BGR2GRAY)
 
-# Histogram
-# hist_i = cv2.calcHist([img_i], [0], None, [256], [0, 256])
-# hist_o = cv2.calcHist([img_o], [0], None, [256], [0, 256])
-# plt.figure('Histogram')
-# plt.plot(hist_o, label='Noise')
-# plt.plot(hist_i, label='Original')
-# plt.plot(hist_o - hist_i, label='Noise-Original')
-# plt.xlim([0, 256])
-# plt.legend()
-# plt.show()
-
 # Filtering process
 # Median Filter
 f_size = 5  # n*n filter
 median = cv2.medianBlur(img_o, f_size)
-ol1, ol2 = np.where((img_o == 0) | (img_o == 255))
-for i, j in zip(ol1, ol2):
-    img_o[i, j] = median[i, j]
+img_b = img_o   # Image before filtering process
 
-mse_b = mse(img_i, median)  # before
-mse_a = mse(img_i, img_o)   # after
-# print('median:' + str(mse_b))
+l1, l2 = np.where((img_o == 0) | (img_o == 255))
+for i, j in zip(l1, l2):
+    img_o[i, j] = median[i, j]
+mse_b = mse(img_b, median)  # before
+mse_a = mse(img_b, img_o)   # after
 # print('1：' + str(mse_a))
 
-k = 2
-while(mse_a < mse_b):
+# k = 2
+while(mse_a != mse_b):
     mse_b = mse_a
     median = cv2.medianBlur(img_o, f_size)
-    l1, l2 = np.where((img_o == 0) | (img_o == 255))
-    for i, j in zip(l1, l2):
-        img_o[i, j] = median[i, j]
+    img_b = img_o
+    img_o = np.where((img_o == 0) | (img_o == 255), median, img_o)
 
-    mse_a = mse(img_i, img_o)
+    mse_a = mse(img_b, img_o)
     # print(str(k) + '：' + str(mse_a))
-    k += 1
+    # k += 1
 
 # Gaussian Filter
 sigma = 0.55    # Standard deviation
 k_size = 5  # kernelsize
 gauss = cv2.GaussianBlur(img_o, (k_size, k_size), sigma)
-mse_b = mse(img_i, img_o)
-mse_a = mse(img_i, gauss)
+img_o = Local_Gaussian(img_o, k_size, sigma, l1, l2)
+mse_b = mse(gauss, img_o)
+mse_a = mse(gauss, img_b)
+# print('1：' + str(mse_a))
 
-while(mse_a < mse_b):
+# k = 2
+while(mse_a != mse_b):
     mse_b = mse_a
-    gauss = cv2.GaussianBlur(img_o, (k_size, k_size), sigma)
+    img_b = img_o
+    img_o = Local_Gaussian(img_o, k_size, sigma, l1, l2)
 
-    for i, j in zip(ol1, ol2):
-        img_o[i, j] = gauss[i, j]
+    mse_a = mse(gauss, img_o)
+    # print(str(k) + '：' + str(mse_a))
+    # k += 1
 
-    mse_a = mse(img_i, img_o)
-
-print('result:' + str(int(mse_a)))
+print('result:' + str(int(mse(img_i, img_o))))
 
 # Display results
 plt.figure('Execution result')
