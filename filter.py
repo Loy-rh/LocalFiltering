@@ -34,46 +34,34 @@ img_n = cv2.cvtColor(img_n, cv2.COLOR_BGR2GRAY)
 
 # Filtering process
 # Median Filter
-F_SIZE = 5  # n*n filter
-img_b = img_o   # Image before filtering process
-img_o = Local_median(img_o, F_SIZE)
-mse_b = 1  # before
-mse_a = mse(img_b, img_o)   # after
-# print('1：' + str(mse_a))
+F_SIZE = 3  # n*n filter
+immse = 1
+k = 0   # Number of attempts
 
-k = 2
-while(mse_a != mse_b):
-    mse_b = mse_a
-    img_b = img_o
+while(immse != 0):
+    img_b = img_o   # Image before filtering process
     img_o = Local_median(img_o, F_SIZE)
 
-    mse_a = mse(img_b, img_o)
-    # print(str(k) + '：' + str(mse_a))
+    immse = mse(img_b, img_o)
     k += 1
 
-print("Number of attempts (median):" + str(k - 1))
+print('Number of attempts (median):' + str(k))
 
 # Gaussian Filter
 SIGMA = 0.55    # Standard deviation
 K_SIZE = 5  # kernelsize
-gauss = cv2.GaussianBlur(img_o, (K_SIZE, K_SIZE), SIGMA)
-img_o = Local_Gaussian(img_n, img_o, K_SIZE, SIGMA)
-mse_b = mse(gauss, img_o)
-mse_a = mse(gauss, img_b)
-# print('1：' + str(mse_a))
+immse = 1
+k = 0
 
-k = 2
-while(mse_a != mse_b):
-    mse_b = mse_a
+while(immse != 0):
     img_b = img_o
     img_o = Local_Gaussian(img_n, img_o, K_SIZE, SIGMA)
 
-    mse_a = mse(gauss, img_o)
-    # print(str(k) + '：' + str(mse_a))
+    immse = mse(img_b, img_o)
     k += 1
 
-print("Number of attempts (Gaussian):" + str(k - 1))
-print('Result of mse:' + str(int(mse(img_i, img_o))))
+print('Number of attempts (Gaussian):' + str(k))
+print('Result of mse:{:.2f}'.format(mse(img_i, img_o)))
 
 # Display results
 # plt.figure('Execution result')
